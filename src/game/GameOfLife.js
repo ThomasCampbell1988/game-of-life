@@ -1,97 +1,82 @@
 
+import CellSet from './CellSet'
+import Cell from './Cell'
+
 export class GameOfLife {
 
-    constructor(initiallLiveCells = []) {
-        this.liveCells = initiallLiveCells
+    constructor(initiallLiveCells = [], width = 10, height = 10) {
+        this.liveCellSet = new CellSet(initiallLiveCells)
+        this.width = width
+        this.height = height
+    }
+
+    liveCells() {
+        return this.liveCellSet.asArray()
     }
 
     toggleCell(x, y) {
-        if (existsInCells( {x, y}, this.liveCells)) {
-            this.liveCells = this.liveCells.filter(cell => cell.x !== x || cell.y !== y)
+        const cell =  new Cell(x, y)
+        if (this.liveCellSet.has(cell)) {
+            this.liveCellSet.delete(cell)
         } else {
-            let copy = this.liveCells.slice()
-            copy.push({'x': x, 'y': y})
-            this.liveCells = copy;
+            this.liveCellSet.add(cell)
         }
     }
 
     step() {
-        let nextState = []
+        let nextState = new CellSet()
 
-        this.liveCells.forEach(liveCell => {
-            let liveNeighbours = getLiveNeighboursForCell(liveCell, this.liveCells)
+        this.liveCellSet.cells.forEach(liveCell => {
+            let liveNeighbours = this.getLiveNeighboursForCell(liveCell)
             if(liveNeighbours.length >= 2 && liveNeighbours.length < 4) {
-                nextState.push(liveCell)
+                nextState.add(liveCell)
             }
-        })
 
-        let deadNeighbours = this.liveCells.reduce( (acc, liveCell) => {
-            getNeighbouringCells(liveCell).forEach(neighbour => {
-                if(!existsInCells(neighbour, this.liveCells) && !existsInCells(neighbour, acc)) {
-                    acc.push(neighbour)
+            this.getDeadNeighboursForCell(liveCell).forEach(deadNeighbour => {
+                liveNeighbours = this.getLiveNeighboursForCell(deadNeighbour)
+                if(liveNeighbours.length === 3) {
+                    nextState.add(deadNeighbour)
                 }
             })
-            return acc
-        }, [])
-
-        deadNeighbours.forEach( deadNeighbour => {
-            let liveNeighbours = getLiveNeighboursForCell(deadNeighbour, this.liveCells)
-            if(liveNeighbours.length == 3) {
-                nextState.push(deadNeighbour)
-            }
         })
 
-        this.liveCells = nextState
+        this.liveCellSet = nextState
     }
 
-}
+    getLiveNeighboursForCell(targetCell) {
+        const neighbours = this.getNeighbouringCells(targetCell)
+        const liveNeighbours = neighbours.filter(neighbour => this.liveCellSet.has(neighbour))
+        return liveNeighbours
+    }
 
-const getLiveNeighboursForCell = function(targetCell, liveCells) {
-    let targetX = targetCell.x
-    let targetY = targetCell.y
-    let liveNeighbours = []
-
-    for(let xDiff = -1; xDiff<2; xDiff++) {
-        for(let yDiff = -1; yDiff<2; yDiff++) {
-            if(xDiff !== 0 || yDiff !== 0) {
-                let neighbour = liveCells.find( cell => cell.x === targetX + xDiff && cell.y === targetY + yDiff)
-                if(neighbour !== undefined){
-                    liveNeighbours.push(neighbour)
+    getDeadNeighboursForCell(targetCell) {
+        const neighbours = this.getNeighbouringCells(targetCell)
+        const deadNeighbours = neighbours.filter(neighbour => !this.liveCellSet.has(neighbour))
+        return deadNeighbours
+    }
+    
+    getNeighbouringCells(targetCell) {
+        let targetX = targetCell.x
+        let targetY = targetCell.y
+        let neighbours = []
+    
+        for(let xDiff = -1; xDiff<2; xDiff++) {
+            for(let yDiff = -1; yDiff<2; yDiff++) {
+                if(xDiff !== 0 || yDiff !== 0) {
+                    let neighbour = new Cell(targetX+xDiff, targetY+yDiff)
+                    if(
+                        neighbour.x >= 0 && neighbour.x < this.width &&
+                        neighbour.y >= 0 && neighbour.y < this.height
+                    ) {
+                        neighbours.push(neighbour)
+                    }
                 }
             }
         }
+    
+        return neighbours
     }
 
-    return liveNeighbours
-}
-
-const getNeighbouringCells = function(targetCell) {
-    let targetX = targetCell.x
-    let targetY = targetCell.y
-    let neighbours = []
-
-    for(let xDiff = -1; xDiff<2; xDiff++) {
-        for(let yDiff = -1; yDiff<2; yDiff++) {
-            if(xDiff !== 0 || yDiff !== 0) {
-                let neighbour = {
-                    x: targetX+xDiff,
-                    y: targetY+yDiff
-                }
-                if(
-                    neighbour.x >= 0 && neighbour.x < 20 &&
-                    neighbour.y >= 0 && neighbour.y < 20
-                ) {
-                    neighbours.push(neighbour)
-                }
-            }
-        }
-    }
-
-    return neighbours
-}
-
-const existsInCells = function(target, cells) {
-    return cells.some(cell => target.x == cell.x && target.y == cell.y)
 }
 
 export default GameOfLife

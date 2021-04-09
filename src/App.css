@@ -2,6 +2,17 @@
   padding: 35px;
 }
 
+.center {
+  margin: auto;
+  display: flex;
+  position: relative;
+  height: 70vh;
+  background-color: red;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1;
+}
+
 h1{
   text-align: center;
 }
