@@ -20,7 +20,7 @@ function App() {
   return (
     <div className="App">
       <div>
-        <h1>Game Of Life</h1>
+        <h1>Game of Life</h1>
       </div>
       <div className="center">
         <GameOfLifeGrid
