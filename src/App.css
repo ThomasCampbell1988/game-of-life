@@ -1,3 +1,19 @@
 .App {
   padding: 35px;
 }
+
+h1{
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding-top: 3vh;
+}
+
+button{
+  font-size: 16px;
+  margin: 8px;
+}

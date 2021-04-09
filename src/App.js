@@ -5,7 +5,7 @@ import GameOfLife from './game/GameOfLife';
 
 function App() {
 
-  let [liveCells, setLiveCells] = useState([{x:1, y:1}])
+  let [liveCells, setLiveCells] = useState([])
   console.log(liveCells)
   let gameOfLife = new GameOfLife(liveCells)
 
@@ -14,8 +14,15 @@ function App() {
     setLiveCells(gameOfLife.liveCells)
   }
 
+  let clear = () => {
+    setLiveCells([])
+  }
+
   return (
     <div className="App">
+      <div>
+        <h1>Game Of Life</h1>
+      </div>
       <GameOfLifeGrid
         liveCells={gameOfLife.liveCells}
         onCellClickedListener={( (x,y) => {
@@ -24,7 +31,10 @@ function App() {
           setLiveCells(gameOfLife.liveCells)
         })}
       />
-      <button onClick={step}>Step</button>
+      <div class="button-container">
+        <button class="clear" onClick={clear}>Clear</button>
+        <button class="step" onClick={step}>Step</button>
+      </div>
     </div>
   );
 }
