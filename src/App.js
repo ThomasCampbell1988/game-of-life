@@ -17,6 +17,8 @@ function App() {
     setLiveCells([])
   }
 
+  document.title = "Game of Life"
+
   return (
     <div className="App">
       <div>
